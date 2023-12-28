@@ -1,59 +1,101 @@
+import { useEffect, useState } from "react";
 import { DatePicker, Flex, Image, Space, Card, Button } from "antd";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { format } from "date-fns";
+import { useGetSingleMovieQuery } from "../services/movieServices";
+import { useGetTheatresByMovieMutation } from "../services/theatreServices";
+import EmptyState from "../components/EmptyState";
 
 function MovieDetailsPage() {
+  const [theatresForSelectedDate, setTheatresForSelectedDate] = useState([]);
+  const [selectedBookingDate, setSelectedBookingDate] = useState(
+    format(new Date(), "dd-MM-yyyy")
+  );
   const navigate = useNavigate();
-  function onBookingDateSelectHandler(_, dateString) {
-    navigate(`/movie/21312312?date=${dateString}`);
+  const { id } = useParams();
+  const { data: movieDetails, isLoading } = useGetSingleMovieQuery(id);
+  const [theatresByMovie] = useGetTheatresByMovieMutation();
+
+  useEffect(() => {
+    async function getTheatresByMovie() {
+      const response = await theatresByMovie({
+        movie: id,
+        date: selectedBookingDate,
+      });
+      if (!response?.data?.data.length) {
+        setTheatresForSelectedDate([]);
+      }
+      if (response?.data?.data.length) {
+        setTheatresForSelectedDate(response?.data?.data);
+      }
+    }
+    getTheatresByMovie();
+  }, [selectedBookingDate, id, theatresByMovie]);
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+  const {
+    title,
+    description,
+    genre,
+    duration,
+    releaseDate,
+    language,
+    posterUrl,
+  } = movieDetails;
+
+  function onBookingDateSelectHandler(date, dateString) {
+    navigate(`/movie/${id}?date=${dateString}`);
+    setSelectedBookingDate(format(new Date(date), "dd-MM-yyyy"));
   }
   return (
     <>
       <div className="movie-information-grid">
-        <Image src="/movie-dummy.jpg" />
+        <Image src={posterUrl} />
         <Space size={20} direction="vertical">
-          <h1>Marvels Avenger Endgame</h1>
-          <p>
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Recusandae
-            aperiam ab enim alias rem cumque officia repudiandae officiis
-            impedit similique, voluptatibus blanditiis vitae aliquid maiores
-            magnam quaerat, saepe ullam. Delectus nisi reiciendis fuga ullam
-            excepturi esse doloremque asperiores culpa nulla dolores ipsum,
-            earum error consequatur facilis vitae similique repellat vero?
-          </p>
-          <h3>Genre : Action</h3>
-          <h3>Language : English</h3>
-          <h3>Duration : 180 min</h3>
-          <h3>Release Date : 05 January 2024</h3>
+          <h1>{title}</h1>
+          <p>{description}</p>
+          <h3>Genre : {genre}</h3>
+          <h3>Language : {language}</h3>
+          <h3>Duration : {duration} min</h3>
+          <h3>Release Date : {releaseDate}</h3>
         </Space>
       </div>
       <Flex gap={10} align="center" justify="end">
         <h4>Select Booking Date</h4>
-        <DatePicker onChange={onBookingDateSelectHandler} format="DD/MM/YYYY" />
+        <DatePicker
+          allowClear={false}
+          onChange={onBookingDateSelectHandler}
+          format="DD-MM-YYYY"
+        />
       </Flex>
       <Flex vertical gap={10}>
         <h2>Theatres</h2>
-        <Card
-          className="theatre-card"
-          bordered={false}
-          title="PVR Connaught Palace"
-        >
-          <Flex gap={10}>
-            <Button>08:00 PM</Button>
-            <Button>10:00 PM</Button>
-          </Flex>
-        </Card>
-        <Card
-          className="theatre-card"
-          bordered={false}
-          title="PVR Connaught Palace"
-        >
-          <Flex gap={10}>
-            <Button onClick={() => navigate("/book-show/sdjnadnl")}>
-              08:00 PM
-            </Button>
-            <Button>10:00 PM</Button>
-          </Flex>
-        </Card>
+        {theatresForSelectedDate.length ? (
+          theatresForSelectedDate?.map((theatre) => (
+            <Card
+              className="theatre-card"
+              bordered={false}
+              title={theatre.name}
+              key={theatre._id}
+            >
+              <Flex gap={10}>
+                {theatre.shows?.map((show) => (
+                  <Button
+                    onClick={() => {
+                      navigate(`/book-show/${show._id}`);
+                    }}
+                    key={show._id}
+                  >
+                    {show.time}
+                  </Button>
+                ))}
+              </Flex>
+            </Card>
+          ))
+        ) : (
+          <EmptyState />
+        )}
       </Flex>
     </>
   );

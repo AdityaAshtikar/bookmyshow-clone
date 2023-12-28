@@ -9,7 +9,7 @@ function PublicRoute({ children }) {
 }
 
 PublicRoute.propTypes = {
-  children: React.Children,
+  children: React.any,
 };
 
 export default PublicRoute;

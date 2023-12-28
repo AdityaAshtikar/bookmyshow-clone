@@ -1,15 +1,27 @@
+import { useEffect } from "react";
 import { Drawer, Form, Input, Select, Button } from "antd";
 import { useGetAllUsersQuery } from "../services/userServices";
 import { useAddNewTheatreMutation } from "../services/theatreServices";
-function AddTheatreForm(props) {
+function UpdateTheatreForm(props) {
   const [form] = Form.useForm();
-  const { open, onClose } = props;
+  const { open, onClose, data } = props;
   const { data: allUsers, isLoading: usersLoading } = useGetAllUsersQuery();
   const [addTheatre] = useAddNewTheatreMutation();
+  useEffect(() => {
+    const formData = {
+      name: data.name,
+      address: data.address,
+      email: data.email,
+      owner: data.owner._id,
+      phone: data.phone,
+    };
+    form.setFieldsValue(formData);
+  }, []);
 
   if (usersLoading) {
     return <p>Loading...</p>;
   }
+
   const usersList = allUsers.map((user) => ({
     label: user.userName,
     value: user._id,
@@ -26,7 +38,7 @@ function AddTheatreForm(props) {
   };
   return (
     <Drawer
-      title="Add A New Theatre"
+      title="Edit Theatre"
       size="large"
       placement="right"
       onClose={() => onClose(false)}
@@ -58,9 +70,9 @@ function AddTheatreForm(props) {
   );
 }
 
-AddTheatreForm.propTypes = {
+UpdateTheatreForm.propTypes = {
   open: Boolean,
   onClose: Function,
 };
 
-export default AddTheatreForm;
+export default UpdateTheatreForm;

@@ -1,31 +1,69 @@
 import { useState } from "react";
-import { Flex } from "antd";
+import { useParams } from "react-router-dom";
+import { Flex, Space, Button } from "antd";
+import { useGetSingleShowQuery } from "../services/showServices";
+import { useMakePaymentMutation } from "../services/showServices";
 function BookSeatsPage() {
+  const { showId } = useParams();
+  const { data: showDetails, isLoading } = useGetSingleShowQuery(showId);
+  const [makePayment] = useMakePaymentMutation();
   const [selectedSeats, setSelectedSeats] = useState([]);
-  const seats = 120;
+  const [totalTicketPrice, setTotalTicketPrice] = useState(0);
 
-  const onSeatClickHandler = (seatNo) => {
-    if ([...selectedSeats].includes(seatNo + 1)) {
-      setSelectedSeats([...selectedSeats].filter((el) => el !== seatNo + 1));
+  const onSeatClickHandler = (seat) => {
+    const selected = [...selectedSeats];
+    if (selected.includes(seat._id)) {
+      setSelectedSeats(selected.filter((el) => el !== seat._id));
+      setTotalTicketPrice((prev) => prev - showDetails.ticketPrice);
       return false;
     }
-    setSelectedSeats([...selectedSeats, seatNo + 1]);
+    selected.push(seat._id);
+    setTotalTicketPrice((prev) => prev + showDetails.ticketPrice);
+    setSelectedSeats(selected);
   };
+
+  const onConfirmPaymentHandler = () => {
+    alert("Paid!");
+  };
+
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
   return (
     <>
-      <h3>Booking for : Dunki</h3>
+      <Flex justify="space-between">
+        <Space direction="vertical">
+          <h3>
+            Booking for : {showDetails.movie.title} - {showDetails.name}{" "}
+          </h3>
+          <h4>Booking Time : {showDetails.time}</h4>
+        </Space>
+        <Space direction="vertical">
+          <h3>Ticket Price : Rs {showDetails.ticketPrice}</h3>
+          {/* <h4>Total Seats Available : {showDetails.totalSeats.length}</h4> */}
+          <h3>Total Price : Rs.{totalTicketPrice}</h3>
+
+          <Button
+            onClick={onConfirmPaymentHandler}
+            disabled={totalTicketPrice === 0}
+            type="primary"
+          >
+            Confirm Booking
+          </Button>
+        </Space>
+      </Flex>
       <div className="screen"></div>
       <Flex justify="center">
         <div className="theatre-seats">
-          {Array.from(Array(seats).keys()).map((seat) => (
+          {showDetails.totalSeats.map((seat) => (
             <div
               onClick={() => onSeatClickHandler(seat)}
-              key={`seat-${seat + 1}`}
+              key={seat._id}
               className={`seat ${
-                selectedSeats.includes(seat + 1) ? "selected" : ""
+                selectedSeats.includes(seat._id) ? "selected" : ""
               }`}
             >
-              {seat + 1}
+              {seat.seatNumber + 1}
             </div>
           ))}
         </div>

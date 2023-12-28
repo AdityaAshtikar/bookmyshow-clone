@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const authMiddleWare = require('../middlewares/authMiddleWare');
 const Movie = require('../models/movieSchema');
+const Show = require('../models/showSchema');
 
 
 router.get('/get-all-movies', authMiddleWare, async (req, res) => {
@@ -73,6 +74,7 @@ router.post('/delete-movie', authMiddleWare, async (req, res) => {
 
     try {
         await Movie.findByIdAndDelete(req.body.movieId);
+        await Show.deleteMany({ movie: req.body.movieId });
         res.send({
             success: true,
             message: "Movie Deleted"

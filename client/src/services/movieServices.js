@@ -20,9 +20,17 @@ export const movieServices = baseAppApi.injectEndpoints({
             }),
             invalidatesTags: ['MOVIES']
         }),
+        deleteMovie: build.mutation({ // POST, PUT, PATCH, DELETE
+            query: (payload) => ({
+                url: '/movies/delete-movie',
+                method: 'POST',
+                body: payload
+            }),
+            invalidatesTags: ['MOVIES']
+        }),
 
     }),
     overrideExisting: false,
 })
 
-export const { useGetAllMoviesQuery, useGetSingleMovieQuery, useAddNewMovieMutation } = movieServices
+export const { useGetAllMoviesQuery, useGetSingleMovieQuery, useAddNewMovieMutation, useDeleteMovieMutation } = movieServices

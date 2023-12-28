@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   Drawer,
   Form,
@@ -8,6 +7,7 @@ import {
   Select,
   DatePicker,
 } from "antd";
+import { format } from "date-fns";
 
 import { useAddNewMovieMutation } from "../services/movieServices";
 
@@ -58,25 +58,16 @@ const LANGUAGES = [
 ];
 
 function AddMovieForm(props) {
-  const [date, setDate] = useState("");
   const [form] = Form.useForm();
   const { open, onClose } = props;
   const [addMovie] = useAddNewMovieMutation();
 
   const onAddMovieHandler = (values) => {
-    const newValues = {
-      ...values,
-      releaseDate: new Date(date),
-    };
-    addMovie(newValues).then((res) => {
-      console.log(res);
+    values.releaseDate = format(new Date(values.releaseDate), "dd-MM-yyyy");
+    addMovie(values).then(() => {
       form.resetFields();
       onClose(false);
     });
-  };
-
-  const onDateChange = (_, dateString) => {
-    setDate(dateString);
   };
 
   return (
@@ -105,7 +96,7 @@ function AddMovieForm(props) {
           <Select options={LANGUAGES} />
         </Form.Item>
         <Form.Item name="releaseDate" label="Release Date">
-          <DatePicker format="YYYY-MM-DD" onChange={onDateChange} />
+          <DatePicker format="DD-MM-YYYY" />
         </Form.Item>
         <Form.Item name="posterUrl" label="Poster URL">
           <Input placeholder="Enter Movie Poster" />

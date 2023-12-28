@@ -10,6 +10,6 @@ export const baseAppApi = createApi({
       'Authorization': `Bearer ${token}`
     },
   }),
-  tagTypes: ['MOVIES', 'MOVIE', 'THEATRES'],
+  tagTypes: ['MOVIES', 'MOVIE', 'THEATRES', 'THEATRE', 'THEATRE-BY-OWNER', 'SHOWS', 'SHOW'],
   endpoints: () => ({}),
 })

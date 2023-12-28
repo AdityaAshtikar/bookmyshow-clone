@@ -96,5 +96,24 @@ router.get("/get-bookings", authMiddleware, async (req, res) => {
     }
 });
 
+//get show by id
+router.get('/:showId', authMiddleware, async (req, res) => {
+    try {
+        const show = await Show.findById(req.params.showId)
+            .populate("movie")
+            .populate("theatre")
+        res.send({
+            success: true,
+            message: "Show fetched",
+            data: show,
+        })
+    } catch (err) {
+        res.send({
+            success: false,
+            message: err.message
+        })
+    }
+})
+
 
 module.exports = router;

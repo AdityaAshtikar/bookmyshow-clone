@@ -22,13 +22,13 @@ const movieSchema = new mongoose.Schema({
         required: true,
     },
     releaseDate: {
-        type: Date,
+        type: String,
         required: true
     },
     posterUrl: {
         type: String
     }
-   
+
 });
 
 module.exports = mongoose.model('movies', movieSchema);

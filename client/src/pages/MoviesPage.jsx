@@ -1,5 +1,6 @@
 import { useGetAllMoviesQuery } from "../services/movieServices";
 import MovieCard from "../components/MovieCard";
+import EmptyState from "../components/EmptyState";
 
 function MoviesPage() {
   const { data, isLoading } = useGetAllMoviesQuery();
@@ -8,12 +9,13 @@ function MoviesPage() {
     return <p>Loading. Please wait...</p>;
   }
 
-  console.log(data);
   return (
     <div className="movies-grid">
-      {data?.map((movie) => (
-        <MovieCard key={movie._id} {...movie} />
-      ))}
+      {data.length ? (
+        data?.map((movie) => <MovieCard key={movie._id} {...movie} />)
+      ) : (
+        <EmptyState />
+      )}
     </div>
   );
 }
