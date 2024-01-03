@@ -16,6 +16,7 @@ import {
 import EmptyState from "../../components/EmptyState";
 
 function AdminProfilePage() {
+  const [selectedTheatre, setSelectedTheatre] = useState(null);
   const { user } = useSelector((state) => state.user);
   const { data: allMovies, isLoading: moviesLoading } = useGetAllMoviesQuery();
   const { data: allTheatres, isLoading: theatreLoading } =
@@ -123,7 +124,12 @@ function AdminProfilePage() {
                   {user.userId === theatre.owner._id ? (
                     <Flex gap={10}>
                       <button>Delete Theatre</button>
-                      <Button onClick={() => openUpdateTheatreForm(true)}>
+                      <Button
+                        onClick={() => {
+                          setSelectedTheatre(theatre);
+                          openUpdateTheatreForm(true);
+                        }}
+                      >
                         Update Theatre
                       </Button>
                     </Flex>
@@ -140,7 +146,11 @@ function AdminProfilePage() {
             <EmptyState />
           )}
           <AddTheatreForm open={addTheatreForm} onClose={openTheatreForm} />
-
+          <UpdateTheatreForm
+            data={selectedTheatre}
+            open={updateTheatreForm}
+            onClose={openUpdateTheatreForm}
+          />
           <AddShowForm open={addShowForm} onClose={openShowForm} />
         </Flex>
       ),

@@ -1,100 +1,46 @@
+const crypto = require('crypto');
 const authMiddleware = require("../middlewares/authMiddleWare");
-
 const router = require("express").Router();
-const stripe = require("stripe")(process.env.stripe_key);
 const Booking = require('../models/showSchema')
-const Show = require('../models/showSchema')
+const Show = require('../models/showSchema');
+const razorpayInstance = require('../razorpay/instance');
+
+
+console.log(razorpayInstance);
+
 
 router.post('/make-payment', authMiddleware, async (req, res) => {
-    try {
-        const { token, amount } = req.body;
-        console.log(token);
-        const customer = await stripe.customers.create({
-            email: token.email,
-            source: token.id
-        })
-        const charge = await stripe.charges.create({
-            amount: amount,
-            currency: "usd",
-            customer: customer.id,
-            receipt_email: token.email,
-            description: "Ticket has been booked for a movie"
-        })
-
-        const transactionId = charge.id;
-        res.send({
-            success: true,
-            message: "Payment done, Ticket booked",
-            data: transactionId
-        })
-
-    } catch (err) {
-        res.send({
-            success: false,
-            message: err.message
-        })
-    }
+    const { totalAmount } = req.body;
+    const order = await razorpayInstance.orders.create({
+        amount: totalAmount * 100,
+        currency: "INR",
+    })
+    res.send({
+        success: true,
+        message: "Order ID created",
+        data: order
+    })
 })
 
-//book shows
-router.post("/book-show", authMiddleware, async (req, res) => {
-    try {
-        // save booking
-        const newBooking = new Booking(req.body);
-        await newBooking.save();
-
-        const show = await Show.findById(req.body.show);
-        // update seats
-        await Show.findByIdAndUpdate(req.body.show, {
-            bookedSeats: [...show.bookedSeats, ...req.body.seats],
-        });
-
-        res.send({
-            success: true,
-            message: "Show booked successfully",
-            data: newBooking,
-        });
-    } catch (error) {
-        res.send({
-            success: false,
-            message: error.message,
-        });
+router.post('/validate-payment', authMiddleware, async (req, res) => {
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
+    const sha = crypto.createHmac("sha256", "2THmiXI8YMzNOCCZlsNekQmd");
+    sha.update(`${razorpay_order_id}|${razorpay_payment_id}`);
+    const digest = sha.digest("hex");
+    if (digest !== razorpay_signature) {
+        res.status(400).json({ msg: 'Transaction not right it seems' });
     }
-});
+    res.send({
+        success: true,
+        message: "Transaction validated",
+        data: {
+            orderId: razorpay_order_id,
+            transactionId: razorpay_payment_id
+        }
+    })
+})
 
 
-router.get("/get-bookings", authMiddleware, async (req, res) => {
-    try {
-        const bookings = await Booking.find({ user: req.body.userId })
-            .populate("user")
-            .populate("show")
-            .populate({
-                path: "show",
-                populate: {
-                    path: "movie",
-                    model: "movies",
-                },
-            })
-            .populate({
-                path: "show",
-                populate: {
-                    path: "theatre",
-                    model: "theatres",
-                },
-            });
-
-        res.send({
-            success: true,
-            message: "Bookings fetched successfully",
-            data: bookings,
-        });
-    } catch (error) {
-        res.send({
-            success: false,
-            message: error.message,
-        });
-    }
-});
 
 //get show by id
 router.get('/:showId', authMiddleware, async (req, res) => {

@@ -1,22 +1,25 @@
 import { useEffect } from "react";
 import { Drawer, Form, Input, Select, Button } from "antd";
 import { useGetAllUsersQuery } from "../services/userServices";
-import { useAddNewTheatreMutation } from "../services/theatreServices";
+import { useUpdateTheatreMutation } from "../services/theatreServices";
 function UpdateTheatreForm(props) {
   const [form] = Form.useForm();
   const { open, onClose, data } = props;
+  console.log("data", data);
   const { data: allUsers, isLoading: usersLoading } = useGetAllUsersQuery();
-  const [addTheatre] = useAddNewTheatreMutation();
+  const [updateTheatre] = useUpdateTheatreMutation();
   useEffect(() => {
+    // if (data) {
     const formData = {
-      name: data.name,
-      address: data.address,
-      email: data.email,
-      owner: data.owner._id,
-      phone: data.phone,
+      name: data?.name,
+      address: data?.address,
+      email: data?.email,
+      owner: data?.owner._id,
+      phone: data?.phone,
     };
     form.setFieldsValue(formData);
-  }, []);
+    // }
+  }, [data]);
 
   if (usersLoading) {
     return <p>Loading...</p>;
@@ -27,9 +30,14 @@ function UpdateTheatreForm(props) {
     value: user._id,
   }));
 
-  const onAddNewTheatreHandler = async (values) => {
+  const onEditTheatreHandler = async (values) => {
+    const newResponse = {
+      ...values,
+      _id: data?._id,
+    };
+    console.log(newResponse);
     try {
-      await addTheatre(values);
+      await updateTheatre(newResponse);
       onClose(false);
       form.resetFields();
     } catch (error) {
@@ -44,7 +52,7 @@ function UpdateTheatreForm(props) {
       onClose={() => onClose(false)}
       open={open}
     >
-      <Form layout="vertical" form={form} onFinish={onAddNewTheatreHandler}>
+      <Form layout="vertical" form={form} onFinish={onEditTheatreHandler}>
         <Form.Item name="name" label="Name">
           <Input placeholder="Enter Theatre Name" />
         </Form.Item>

@@ -9,6 +9,7 @@ import ProfilePage from "../pages/ProfilePage";
 import AdminProfilePage from "../pages/Admin/AdminProfilePage";
 import MovieDetailsPage from "../pages/MovieDetailsPage";
 import BookSeatsPage from "../pages/BookSeats";
+import SuccessPage from "../pages/Success";
 
 const router = createBrowserRouter([
   {
@@ -70,6 +71,10 @@ const router = createBrowserRouter([
             <BookSeatsPage />
           </AppContainer>
         ),
+      },
+      {
+        path: "/success",
+        element: <SuccessPage />,
       },
     ],
   },

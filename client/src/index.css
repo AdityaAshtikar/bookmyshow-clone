@@ -107,3 +107,19 @@ body {
   background-color: red;
   color: white;
 }
+
+.booked {
+  background-color: gainsboro;
+  pointer-events: none;
+}
+
+.success-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+}
+
+.success-texts > * {
+  margin-block: 1rem;
+  text-align: center;
+}

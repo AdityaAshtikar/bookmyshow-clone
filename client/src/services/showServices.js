@@ -13,9 +13,18 @@ export const showServices = baseAppApi.injectEndpoints({
                 method: 'POST',
                 body: payload
             }),
+            transformResponse: (apiResponse) => apiResponse.data
+        }),
+        validatePayment: build.mutation({ // POST, PUT, PATCH, DELETE
+            query: (payload) => ({
+                url: '/shows/validate-payment',
+                method: 'POST',
+                body: payload
+            }),
+            transformResponse: (apiResponse) => apiResponse.data
         }),
     }),
     overrideExisting: false,
 })
 
-export const { useGetSingleShowQuery, useMakePaymentMutation } = showServices
+export const { useGetSingleShowQuery, useMakePaymentMutation, useValidatePaymentMutation, useBookSeatsMutation } = showServices

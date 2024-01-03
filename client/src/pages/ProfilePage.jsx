@@ -1,8 +1,12 @@
 import { Typography, Flex, Divider, Tag } from "antd";
 import { useSelector } from "react-redux";
+import { useGetBookingsQuery } from "../services/bookingService";
 
 function ProfilePage() {
   const { user } = useSelector((state) => state.user);
+  console.log(user);
+  const { data } = useGetBookingsQuery(user?.userId, {});
+  console.log(data);
   const { Text, Title } = Typography;
   return (
     <>
