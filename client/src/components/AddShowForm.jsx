@@ -27,12 +27,12 @@ function AddShowForm(props) {
     return <p>Loading...</p>;
   }
 
-  const ownerTheatres = theatres.map((theatre) => ({
+  const ownerTheatres = theatres?.map((theatre) => ({
     label: theatre.name,
     value: theatre._id,
   }));
 
-  const moviesList = movies.map((movie) => ({
+  const moviesList = movies?.map((movie) => ({
     label: movie.title,
     value: movie._id,
   }));

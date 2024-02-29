@@ -5,10 +5,6 @@ const Booking = require('../models/showSchema')
 const Show = require('../models/showSchema');
 const razorpayInstance = require('../razorpay/instance');
 
-
-console.log(razorpayInstance);
-
-
 router.post('/make-payment', authMiddleware, async (req, res) => {
     const { totalAmount } = req.body;
     const order = await razorpayInstance.orders.create({

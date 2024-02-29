@@ -6,7 +6,6 @@ import { SmileOutlined } from "@ant-design/icons";
 import { useSelector, useDispatch } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-import { IconBxMoviePlay } from "../icons";
 import { setUser, resetUser } from "../store/slices/userSlice";
 
 const { Header, Content } = Layout;
@@ -18,7 +17,6 @@ const AppContainer = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("dasdas");
     const token = localStorage.getItem("user-scaler-bookshow");
     if (token) {
       const decode = jwtDecode(token);
@@ -55,12 +53,13 @@ const AppContainer = ({ children }) => {
     <Layout>
       <Header className="primary__header">
         <Flex
-          gap={2}
+          gap={4}
           align="center"
           className="primary__page__link"
           onClick={() => navigate("/")}
         >
-          <IconBxMoviePlay color="red" width="2rem" height="2rem" />
+          {/* <IconBxMoviePlay color="red" width="2rem" height="2rem" /> */}
+          <h1 >🎦</h1>
           <h4 className="primary__title">Scaler Book Show</h4>
         </Flex>
         <Dropdown
@@ -85,7 +84,7 @@ const AppContainer = ({ children }) => {
   );
 };
 
-AppContainer.propTypes = {
-  children: React.Children,
-};
+// AppContainer.propTypes = {
+//   children: propt,
+// };
 export default AppContainer;

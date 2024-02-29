@@ -49,7 +49,7 @@ function AdminProfilePage() {
             </Button>
           </Flex>
           <Flex vertical gap={10}>
-            {allMovies.length ? (
+            {allMovies?.length ? (
               allMovies?.map((movie) => (
                 <Card key={movie._id} title={movie.title}>
                   <Flex gap={20} justify="space-between" align="center">
@@ -90,7 +90,7 @@ function AdminProfilePage() {
               Add Theatre
             </Button>
           </Flex>
-          {allTheatres.length ? (
+          {allTheatres?.length ? (
             allTheatres?.map((theatre) => (
               <Card key={theatre._id}>
                 <Space direction="vertical">
